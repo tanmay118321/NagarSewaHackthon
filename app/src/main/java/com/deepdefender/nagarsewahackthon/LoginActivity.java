@@ -104,7 +104,7 @@ public class LoginActivity extends AppCompatActivity {
         }
 
         if (TextUtils.isEmpty(password) || password.length() < 6) {
-            etPassword.setError("Enter valid password (min 6 characters)");
+            etPassword.setError("Enter valid password");
             return;
         }
 
@@ -113,11 +113,37 @@ public class LoginActivity extends AppCompatActivity {
         mAuth.signInWithEmailAndPassword(email, password)
                 .addOnSuccessListener(authResult -> {
 
-                    Toast.makeText(this,
-                            "Login Successful",
-                            Toast.LENGTH_SHORT).show();
+                    btnLogin.setEnabled(true);
 
-                    startActivity(new Intent(this, HomeActivity.class));
+                    // 🔥 ROLE CHECK
+                    if (email.equals("admin@gmail.com") && password.equals("admin@123")) {
+
+                        Toast.makeText(this,
+                                "Welcome Admin",
+                                Toast.LENGTH_SHORT).show();
+
+                        startActivity(new Intent(this,
+                                com.deepdefender.nagarsewahackthon.Admin.AdminActivity.class));
+
+                    } else if (email.equals("super11@gmail.com") && password.equals("super@123")) {
+
+                        Toast.makeText(this,
+                                "Welcome Super Admin",
+                                Toast.LENGTH_SHORT).show();
+
+                        startActivity(new Intent(this,
+                                SuperAdminDashboardActivity.class));
+
+                    } else {
+
+                        Toast.makeText(this,
+                                "Login Successful",
+                                Toast.LENGTH_SHORT).show();
+
+                        startActivity(new Intent(this,
+                                HomeActivity.class));
+                    }
+
                     finish();
 
                 })
@@ -130,6 +156,7 @@ public class LoginActivity extends AppCompatActivity {
                             Toast.LENGTH_LONG).show();
                 });
     }
+
 
     private void resetPassword() {
 
