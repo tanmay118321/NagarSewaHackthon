@@ -1,10 +1,11 @@
 <?xml version="1.0" encoding="utf-8"?>
 <RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
     android:background="#F4F6F9"
     android:layout_width="match_parent"
+    android:fitsSystemWindows="true"
     android:layout_height="match_parent">
 
-    <!-- SCROLL CONTENT -->
     <ScrollView
         android:layout_width="match_parent"
         android:layout_height="match_parent"
@@ -167,13 +168,7 @@
         android:layout_width="match_parent"
         android:layout_height="wrap_content">
 
-        <Button
-            android:id="@+id/btnAssign"
-            android:text="Assign to Worker"
-            android:textColor="#FFF"
-            android:backgroundTint="#1976D2"
-            android:layout_width="match_parent"
-            android:layout_height="48dp"/>
+
 
         <Button
             android:id="@+id/btnResolve"
@@ -182,7 +177,16 @@
             android:backgroundTint="#E8F5E9"
             android:layout_marginTop="8dp"
             android:layout_width="match_parent"
-            android:layout_height="48dp"/>
+            android:layout_height="48dp"
+            android:layout_marginBottom="30dp"/>
+        <Button
+            android:id="@+id/btnAssign"
+            android:text="Assign to Worker"
+            android:textColor="#FFF"
+            android:backgroundTint="#1976D2"
+            android:layout_width="match_parent"
+            android:layout_height="48dp"
+            android:layout_marginBottom="100dp"/>
     </LinearLayout>
 
 </RelativeLayout>
