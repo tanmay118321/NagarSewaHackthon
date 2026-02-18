@@ -326,9 +326,36 @@ public class RegisterComplaintActivity extends AppCompatActivity {
 
     private String bitmapToBase64(Bitmap bitmap) {
 
+        // 🔹 Resize to max 800px
+        int maxSize = 800;
+
+        int width = bitmap.getWidth();
+        int height = bitmap.getHeight();
+
+        float ratio = Math.min(
+                (float) maxSize / width,
+                (float) maxSize / height
+        );
+
+        int newWidth = Math.round(width * ratio);
+        int newHeight = Math.round(height * ratio);
+
+        Bitmap resized = Bitmap.createScaledBitmap(bitmap, newWidth, newHeight, true);
+
+        // 🔹 Compress to reduce size
         ByteArrayOutputStream baos = new ByteArrayOutputStream();
-        bitmap.compress(Bitmap.CompressFormat.JPEG, 60, baos);
-        return Base64.encodeToString(baos.toByteArray(), Base64.DEFAULT);
+        resized.compress(Bitmap.CompressFormat.JPEG, 40, baos);
+
+        byte[] bytes = baos.toByteArray();
+
+        // 🔹 SAFETY CHECK (< 1MB)
+        if (bytes.length > 900000) {  // ~0.9MB safe
+            baos.reset();
+            resized.compress(Bitmap.CompressFormat.JPEG, 25, baos);
+            bytes = baos.toByteArray();
+        }
+
+        return Base64.encodeToString(bytes, Base64.NO_WRAP);
     }
 
     @Override
@@ -336,6 +363,7 @@ public class RegisterComplaintActivity extends AppCompatActivity {
                                            @NonNull String[] permissions,
                                            @NonNull int[] grantResults) {
 
+        super.onRequestPermissionsResult(requestCode, permissions, grantResults);
         if (requestCode == 1 && grantResults.length > 0 &&
                 grantResults[0] == PackageManager.PERMISSION_GRANTED) {
 
