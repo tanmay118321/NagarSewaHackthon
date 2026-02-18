@@ -4,6 +4,7 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.TextView;
+
 import androidx.annotation.NonNull;
 import androidx.recyclerview.widget.RecyclerView;
 
@@ -11,33 +12,69 @@ import com.deepdefender.nagarsewahackthon.R;
 
 import java.util.List;
 
-public class NewComplaintAdapter extends RecyclerView.Adapter<NewComplaintAdapter.ViewHolder> {
-    private List<Complaint> list;
+public class NewComplaintAdapter
+        extends RecyclerView.Adapter<NewComplaintAdapter.ViewHolder> {
 
-    public NewComplaintAdapter(List<Complaint> list) { this.list = list; }
+    public interface OnItemClick {
+        void onClick(Complaint complaint);
+    }
+
+    private List<Complaint> list;
+    private OnItemClick listener;
+
+    public NewComplaintAdapter(List<Complaint> list, OnItemClick listener) {
+        this.list = list;
+        this.listener = listener;
+    }
 
     @NonNull
     @Override
     public ViewHolder onCreateViewHolder(@NonNull ViewGroup parent, int viewType) {
-        View view = LayoutInflater.from(parent.getContext()).inflate(R.layout.item_new_complaint, parent, false);
+        View view = LayoutInflater.from(parent.getContext())
+                .inflate(R.layout.item_new_complaint, parent, false);
         return new ViewHolder(view);
     }
 
     @Override
     public void onBindViewHolder(@NonNull ViewHolder holder, int position) {
+
         Complaint item = list.get(position);
-        holder.title.setText(item.getTitle());
-        holder.subtitle.setText(item.getSubtitle());
+
+        // Title → Issues detected (AI result)
+        holder.title.setText(item.getIssues());
+
+        // Subtitle → Address
+        holder.subtitle.setText(item.getAddress());
+
+        // Badge → Status
         holder.badge.setText(item.getStatus());
+
+        // Badge color logic
+        if ("Pending".equalsIgnoreCase(item.getStatus())) {
+            holder.badge.setBackgroundResource(R.drawable.bg_badge_pending);
+        } else {
+            holder.badge.setBackgroundResource(R.drawable.bg_badge_resolved);
+        }
+
+        // Click → open detail
+        holder.itemView.setOnClickListener(v -> {
+            if (listener != null) listener.onClick(item);
+        });
     }
 
     @Override
-    public int getItemCount() { return list.size(); }
+    public int getItemCount() {
+        return list.size();
+    }
 
+    // 🔽 ViewHolder
     public static class ViewHolder extends RecyclerView.ViewHolder {
+
         TextView title, subtitle, badge;
-        public ViewHolder(View itemView) {
+
+        public ViewHolder(@NonNull View itemView) {
             super(itemView);
+
             title = itemView.findViewById(R.id.itemTitle);
             subtitle = itemView.findViewById(R.id.itemSubtitle);
             badge = itemView.findViewById(R.id.itemBadge);

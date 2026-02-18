@@ -2,10 +2,12 @@
 <manifest xmlns:android="http://schemas.android.com/apk/res/android">
 
     <uses-permission android:name="android.permission.ACCESS_FINE_LOCATION" />
-    <uses-permission android:name="android.permission.ACCESS_FINE_LOCATION" />
     <uses-permission android:name="android.permission.ACCESS_COARSE_LOCATION" />
-    <uses-permission android:name="android.permission.CAMERA" />
-    <uses-permission android:name="android.permission.READ_EXTERNAL_STORAGE" />
+    <uses-permission android:name="android.permission.ACCESS_FINE_LOCATION"/>
+    <uses-permission android:name="android.permission.ACCESS_COARSE_LOCATION"/>
+    <uses-permission android:name="android.permission.CAMERA"/>
+    <uses-permission android:name="android.permission.READ_EXTERNAL_STORAGE"/>
+
 
     <application
         android:allowBackup="true"
@@ -16,15 +18,9 @@
         android:roundIcon="@drawable/img"
         android:supportsRtl="true"
         android:theme="@style/Theme.NagarSewaHackthon">
-        <activity android:name=".Admin.AnalyticsActivity" />
-
-
         <meta-data
             android:name="com.google.android.geo.API_KEY"
-            android:value="YOUR_MAP_KEY" />
-        <meta-data
-            android:name="org.osmdroid.config"
-            android:value="osmdroid" />
+            android:value="YOUR_MAP_KEY"/>
 
         <activity
             android:name=".UserFragments.RegisterComplaintActivity"
