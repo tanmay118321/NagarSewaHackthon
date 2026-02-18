@@ -1,0 +1,146 @@
+<?xml version="1.0" encoding="utf-8"?>
+<ScrollView xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:id="@+id/main"
+    android:layout_height="match_parent"
+    android:background="#FFFFFF"
+    android:fillViewport="true">
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:orientation="vertical"
+        android:padding="24dp">
+
+        <!-- Heading -->
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="Join Smart Urban"
+            android:textSize="28sp"
+            android:textStyle="bold"
+            android:textColor="#0A0A0A"/>
+
+        <TextView
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:text="Sign up to start reporting civic issues in your neighborhood and help improve your city."
+            android:textSize="15sp"
+            android:textColor="#5E6E7E"
+            android:layout_marginTop="6dp"
+            android:layout_marginBottom="28dp"/>
+
+        <!-- Full Name -->
+        <EditText
+            android:id="@+id/etName"
+            android:layout_width="match_parent"
+            android:layout_height="60dp"
+            android:hint="Enter your full name"
+            android:background="@drawable/bg_input"
+            android:paddingHorizontal="18dp"
+            android:drawableStart="@drawable/ic_person"
+            android:drawablePadding="12dp"/>
+
+        <!-- Email -->
+        <EditText
+            android:id="@+id/etEmail"
+            android:layout_width="match_parent"
+            android:layout_height="60dp"
+            android:layout_marginTop="18dp"
+            android:hint="example@email.com"
+            android:inputType="textEmailAddress"
+            android:background="@drawable/bg_input"
+            android:paddingHorizontal="18dp"
+            android:drawableStart="@drawable/ic_email"
+            android:drawablePadding="12dp"/>
+
+        <!-- Phone -->
+        <EditText
+            android:id="@+id/etPhone"
+            android:layout_width="match_parent"
+            android:layout_height="60dp"
+            android:layout_marginTop="18dp"
+            android:hint="+91 9876543210"
+            android:inputType="phone"
+            android:background="@drawable/bg_input"
+            android:paddingHorizontal="18dp"
+            android:drawableStart="@drawable/ic_phone"
+            android:drawablePadding="12dp"/>
+
+        <!-- Current City -->
+        <EditText
+            android:id="@+id/etCity"
+            android:layout_width="match_parent"
+            android:layout_height="60dp"
+            android:layout_marginTop="18dp"
+            android:hint="Detecting your city..."
+            android:focusable="false"
+            android:background="@drawable/bg_input"
+            android:paddingHorizontal="18dp"
+            android:drawableStart="@drawable/ic_location"
+            android:drawablePadding="12dp"/>
+
+        <!-- Password -->
+        <EditText
+            android:id="@+id/etPassword"
+            android:layout_width="match_parent"
+            android:layout_height="60dp"
+            android:layout_marginTop="18dp"
+            android:hint="Create a password"
+            android:inputType="textPassword"
+            android:background="@drawable/bg_input"
+            android:paddingHorizontal="18dp"
+            android:drawableStart="@drawable/ic_lock"
+            android:drawableEnd="@drawable/ic_eye"
+            android:drawablePadding="12dp"/>
+
+        <!-- Confirm Password -->
+        <EditText
+            android:id="@+id/etConfirmPassword"
+            android:layout_width="match_parent"
+            android:layout_height="60dp"
+            android:layout_marginTop="18dp"
+            android:hint="Re-enter password"
+            android:inputType="textPassword"
+            android:background="@drawable/bg_input"
+            android:paddingHorizontal="18dp"
+            android:drawableStart="@drawable/ic_lock"
+            android:drawablePadding="12dp"/>
+
+        <!-- Button -->
+        <androidx.appcompat.widget.AppCompatButton
+            android:id="@+id/btnRegister"
+            android:layout_width="match_parent"
+            android:layout_height="60dp"
+            android:layout_marginTop="30dp"
+            android:text="Create Account"
+            android:textSize="17sp"
+            android:textStyle="bold"
+            android:background="@drawable/bg_button"
+            android:textColor="@android:color/white"
+            android:backgroundTint="#0077FF"/>
+
+        <!-- Terms -->
+        <TextView
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:text="By signing up, you agree to our Terms of Service and Privacy Policy."
+            android:textSize="12sp"
+            android:textColor="#7C8A98"
+            android:gravity="center"
+            android:layout_marginTop="18dp"/>
+
+        <!-- Login -->
+        <TextView
+            android:id="@+id/tvLogin"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:text="Already have an account? Log in"
+            android:textColor="#2D7DD2"
+            android:textStyle="bold"
+            android:gravity="center"
+            android:layout_marginTop="26dp"/>
+
+    </LinearLayout>
+
+</ScrollView>
