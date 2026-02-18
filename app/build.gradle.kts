@@ -4,9 +4,8 @@ plugins {
 
 android {
     namespace = "com.deepdefender.nagarsewahackthon"
-    compileSdk {
-        version = release(36)
-    }
+    compileSdk = 36
+
 
     defaultConfig {
         applicationId = "com.deepdefender.nagarsewahackthon"
