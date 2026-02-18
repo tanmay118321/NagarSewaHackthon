@@ -9,13 +9,12 @@ import android.location.Location;
 import android.os.Bundle;
 import android.text.TextUtils;
 import android.util.Patterns;
-import android.widget.Button;
-import android.widget.EditText;
 import android.widget.Toast;
 
 import androidx.activity.EdgeToEdge;
 import androidx.annotation.NonNull;
 import androidx.appcompat.app.AppCompatActivity;
+import androidx.appcompat.widget.AppCompatButton;
 import androidx.core.app.ActivityCompat;
 import androidx.core.graphics.Insets;
 import androidx.core.view.ViewCompat;
@@ -23,17 +22,26 @@ import androidx.core.view.WindowInsetsCompat;
 
 import com.google.android.gms.location.FusedLocationProviderClient;
 import com.google.android.gms.location.LocationServices;
+import com.google.firebase.auth.FirebaseAuth;
+import com.google.firebase.firestore.FirebaseFirestore;
+
+import android.widget.EditText;
 
 import java.io.IOException;
+import java.util.HashMap;
 import java.util.List;
 import java.util.Locale;
+import java.util.Map;
 
 public class RegistrationActivity extends AppCompatActivity {
 
     private static final int LOCATION_REQUEST_CODE = 101;
 
     EditText etName, etEmail, etPhone, etCity, etPassword, etConfirmPassword;
-    Button btnRegister;
+    AppCompatButton btnRegister;
+
+    FirebaseAuth mAuth;
+    FirebaseFirestore db;
 
     FusedLocationProviderClient fusedLocationClient;
 
@@ -50,7 +58,6 @@ public class RegistrationActivity extends AppCompatActivity {
             return insets;
         });
 
-        // Initialize Views
         etName = findViewById(R.id.etName);
         etEmail = findViewById(R.id.etEmail);
         etPhone = findViewById(R.id.etPhone);
@@ -59,46 +66,16 @@ public class RegistrationActivity extends AppCompatActivity {
         etConfirmPassword = findViewById(R.id.etConfirmPassword);
         btnRegister = findViewById(R.id.btnRegister);
 
-        fusedLocationClient = LocationServices.getFusedLocationProviderClient(this);
+        mAuth = FirebaseAuth.getInstance();
+        db = FirebaseFirestore.getInstance();
 
+        fusedLocationClient = LocationServices.getFusedLocationProviderClient(this);
         detectCity();
 
-        btnRegister.setOnClickListener(v -> validateUser());
+        btnRegister.setOnClickListener(v -> registerUser());
     }
 
-    private void detectCity() {
-
-        if (ActivityCompat.checkSelfPermission(this, Manifest.permission.ACCESS_FINE_LOCATION)
-                != PackageManager.PERMISSION_GRANTED) {
-
-            ActivityCompat.requestPermissions(this,
-                    new String[]{Manifest.permission.ACCESS_FINE_LOCATION},
-                    LOCATION_REQUEST_CODE);
-            return;
-        }
-
-        fusedLocationClient.getLastLocation().addOnSuccessListener(location -> {
-            if (location != null) {
-                Geocoder geocoder = new Geocoder(this, Locale.getDefault());
-                try {
-                    List<Address> addresses = geocoder.getFromLocation(
-                            location.getLatitude(),
-                            location.getLongitude(),
-                            1);
-
-                    if (addresses != null && !addresses.isEmpty()) {
-                        String city = addresses.get(0).getLocality();
-                        etCity.setText(city);
-                    }
-
-                } catch (IOException e) {
-                    e.printStackTrace();
-                }
-            }
-        });
-    }
-
-    private void validateUser() {
+    private void registerUser() {
 
         String name = etName.getText().toString().trim();
         String email = etEmail.getText().toString().trim();
@@ -117,44 +94,72 @@ public class RegistrationActivity extends AppCompatActivity {
             return;
         }
 
-        if (phone.length() < 10) {
-            etPhone.setError("Enter valid phone number");
-            return;
-        }
-
-        if (TextUtils.isEmpty(city)) {
-            Toast.makeText(this, "Enable location to detect city", Toast.LENGTH_SHORT).show();
-            return;
-        }
-
-        if (password.length() < 8) {
-            etPassword.setError("Minimum 8 characters required");
-            return;
-        }
-
         if (!password.equals(confirm)) {
             etConfirmPassword.setError("Passwords do not match");
             return;
         }
 
-        Toast.makeText(this, "Registration Successful!", Toast.LENGTH_SHORT).show();
+        mAuth.createUserWithEmailAndPassword(email, password)
+                .addOnSuccessListener(authResult -> {
 
-        startActivity(new Intent(this, MainActivity.class));
-        finish();
+                    String uid = mAuth.getCurrentUser().getUid();
+
+                    Map<String, Object> user = new HashMap<>();
+                    user.put("uid", uid);
+                    user.put("name", name);
+                    user.put("email", email);
+                    user.put("phone", phone);
+                    user.put("city", city);
+
+                    db.collection("Users")
+                            .document(uid)
+                            .set(user)
+                            .addOnSuccessListener(unused -> {
+
+                                Toast.makeText(this,
+                                        "Registration Successful!",
+                                        Toast.LENGTH_SHORT).show();
+
+                                startActivity(new Intent(this, HomeActivity.class));
+                                finish();
+
+                            });
+                })
+                .addOnFailureListener(e ->
+                        Toast.makeText(this,
+                                e.getMessage(),
+                                Toast.LENGTH_LONG).show());
     }
 
-    @Override
-    public void onRequestPermissionsResult(int requestCode,
-                                           @NonNull String[] permissions,
-                                           @NonNull int[] grantResults) {
+    private void detectCity() {
+        if (ActivityCompat.checkSelfPermission(this,
+                Manifest.permission.ACCESS_FINE_LOCATION)
+                != PackageManager.PERMISSION_GRANTED) {
 
-        super.onRequestPermissionsResult(requestCode, permissions, grantResults);
-
-        if (requestCode == LOCATION_REQUEST_CODE &&
-                grantResults.length > 0 &&
-                grantResults[0] == PackageManager.PERMISSION_GRANTED) {
-
-            detectCity();
+            ActivityCompat.requestPermissions(this,
+                    new String[]{Manifest.permission.ACCESS_FINE_LOCATION},
+                    LOCATION_REQUEST_CODE);
+            return;
         }
+
+        fusedLocationClient.getLastLocation().addOnSuccessListener(location -> {
+            if (location != null) {
+                Geocoder geocoder = new Geocoder(this, Locale.getDefault());
+                try {
+                    List<Address> addresses =
+                            geocoder.getFromLocation(
+                                    location.getLatitude(),
+                                    location.getLongitude(),
+                                    1);
+
+                    if (addresses != null && !addresses.isEmpty()) {
+                        etCity.setText(addresses.get(0).getLocality());
+                    }
+
+                } catch (IOException e) {
+                    e.printStackTrace();
+                }
+            }
+        });
     }
 }
