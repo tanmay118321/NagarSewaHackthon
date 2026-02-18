@@ -11,7 +11,8 @@
     <androidx.constraintlayout.widget.ConstraintLayout
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:padding="16dp">
+        android:padding="16dp"
+        android:layout_marginTop="30dp">
 
         <ImageView
             android:id="@+id/ivAvatar"
@@ -47,8 +48,8 @@
             app:layout_constraintTop_toBottomOf="@id/tvWelcome" />
         <ImageView
             android:id="@+id/ivAnalytics"
-            android:layout_width="42dp"
-            android:layout_height="42dp"
+            android:layout_width="60dp"
+            android:layout_height="60dp"
             android:src="@drawable/ic_analytics"
 
             android:padding="10dp"
