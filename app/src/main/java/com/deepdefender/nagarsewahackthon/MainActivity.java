@@ -17,7 +17,7 @@ public class MainActivity extends AppCompatActivity {
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        setContentView(R.layout.activity_splash); // ⚠ load splash layout
+        setContentView(R.layout.activity_main); // ⚠ load splash layout
 
         progressBar = findViewById(R.id.progressBar);
 
@@ -44,7 +44,7 @@ public class MainActivity extends AppCompatActivity {
             handler.post(() -> {
 
                 // Change HomeActivity to your next screen
-                Intent intent = new Intent(MainActivity.this, HomeActivity.class);
+                Intent intent = new Intent(MainActivity.this, LoginActivity.class);
                 startActivity(intent);
                 finish();
 
