@@ -5,9 +5,9 @@ import android.os.Bundle;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.fragment.app.Fragment;
 
+import com.deepdefender.nagarsewahackthon.UserFragments.UserHomeFragment;
 import com.deepdefender.nagarsewahackthon.UserFragments.UserExploreFragment;
 import com.deepdefender.nagarsewahackthon.UserFragments.UserHistoryFragment;
-import com.deepdefender.nagarsewahackthon.UserFragments.UserHomeFragment;
 import com.deepdefender.nagarsewahackthon.UserFragments.UserProfileFragment;
 import com.google.android.material.bottomnavigation.BottomNavigationView;
 
@@ -22,7 +22,6 @@ public class HomeActivity extends AppCompatActivity {
 
         bottomNavigation = findViewById(R.id.bottomNavigation);
 
-        // Load default fragment
         loadFragment(new UserHomeFragment());
 
         bottomNavigation.setOnItemSelectedListener(item -> {

@@ -44,6 +44,20 @@
             android:layout_marginStart="12dp"
             app:layout_constraintStart_toEndOf="@id/ivAvatar"
             app:layout_constraintTop_toBottomOf="@id/tvWelcome" />
+        <ImageView
+            android:id="@+id/ivAnalytics"
+            android:layout_width="42dp"
+            android:layout_height="42dp"
+            android:src="@drawable/ic_analytics"
+
+            android:padding="10dp"
+            android:clickable="true"
+            android:focusable="true"
+            app:tint="#425ADB"
+            app:layout_constraintTop_toTopOf="@id/tvDashboardTitle"
+            app:layout_constraintBottom_toBottomOf="@id/tvDashboardTitle"
+            app:layout_constraintEnd_toEndOf="parent"/>
+
 
         <TextView
             android:id="@+id/tvSectionNew"
