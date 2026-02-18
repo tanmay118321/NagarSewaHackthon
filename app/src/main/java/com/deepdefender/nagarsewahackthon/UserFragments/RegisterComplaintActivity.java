@@ -23,6 +23,8 @@ import com.deepdefender.nagarsewahackthon.R;
 import com.google.android.gms.location.*;
 import com.google.firebase.firestore.FirebaseFirestore;
 
+import org.json.JSONArray;
+import org.json.JSONObject;
 import org.tensorflow.lite.Interpreter;
 
 import java.io.ByteArrayOutputStream;
@@ -30,6 +32,8 @@ import java.io.InputStream;
 import java.nio.ByteBuffer;
 import java.nio.ByteOrder;
 import java.util.*;
+
+import okhttp3.*;
 
 public class RegisterComplaintActivity extends AppCompatActivity {
 
@@ -39,7 +43,6 @@ public class RegisterComplaintActivity extends AppCompatActivity {
     Button btnSubmit;
 
     FusedLocationProviderClient fusedLocationClient;
-
     Bitmap selectedBitmap;
 
     Interpreter pipeModel, potholeModel, garbageModel;
@@ -47,8 +50,11 @@ public class RegisterComplaintActivity extends AppCompatActivity {
     int inputSize = 640;
 
     String detectedIssues = "None";
+    String grokDetectedIssues = "";
 
     FirebaseFirestore db;
+
+    private static final String GROK_API_KEY = "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";
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -62,7 +68,6 @@ public class RegisterComplaintActivity extends AppCompatActivity {
         btnSubmit = findViewById(R.id.btnSubmitComplaint);
 
         db = FirebaseFirestore.getInstance();
-
         fusedLocationClient = LocationServices.getFusedLocationProviderClient(this);
 
         btnBack.setOnClickListener(v -> finish());
@@ -71,14 +76,14 @@ public class RegisterComplaintActivity extends AppCompatActivity {
         loadModels();
 
         icCamera.setOnClickListener(v -> openGallery());
-
         btnSubmit.setOnClickListener(v -> submitComplaint());
     }
 
     // 📍 LOCATION
     private void getCurrentLocation() {
 
-        if (ActivityCompat.checkSelfPermission(this, Manifest.permission.ACCESS_FINE_LOCATION)
+        if (ActivityCompat.checkSelfPermission(this,
+                Manifest.permission.ACCESS_FINE_LOCATION)
                 != PackageManager.PERMISSION_GRANTED) {
 
             ActivityCompat.requestPermissions(this,
@@ -96,7 +101,7 @@ public class RegisterComplaintActivity extends AppCompatActivity {
                             1
                     );
 
-                    if (addresses != null && addresses.size() > 0) {
+                    if (addresses != null && !addresses.isEmpty()) {
                         tvAddress.setText(addresses.get(0).getAddressLine(0));
                     }
 
@@ -118,9 +123,7 @@ public class RegisterComplaintActivity extends AppCompatActivity {
                     try {
                         selectedBitmap = MediaStore.Images.Media.getBitmap(getContentResolver(), uri);
                         icCamera.setImageBitmap(selectedBitmap);
-
                         new Thread(() -> runAllModels(selectedBitmap)).start();
-
                     } catch (Exception e) {
                         e.printStackTrace();
                     }
@@ -128,26 +131,24 @@ public class RegisterComplaintActivity extends AppCompatActivity {
             });
 
     private void openGallery() {
-        Intent intent = new Intent(Intent.ACTION_PICK, MediaStore.Images.Media.EXTERNAL_CONTENT_URI);
+        Intent intent = new Intent(Intent.ACTION_PICK,
+                MediaStore.Images.Media.EXTERNAL_CONTENT_URI);
         imageLauncher.launch(intent);
     }
 
-    // 🤖 LOAD MODELS (PARTIAL ALLOWED)
+    // 🤖 LOAD MODELS
     private void loadModels() {
 
-        try {
-            pipeModel = new Interpreter(loadModelFile("PipeLeakage.tflite"));
-        } catch (Exception e) { pipeModel = null; }
+        try { pipeModel = new Interpreter(loadModelFile("PipeLeakage.tflite")); }
+        catch (Exception e) { pipeModel = null; }
 
-        try {
-            potholeModel = new Interpreter(loadModelFile("pothole.tflite"));
-        } catch (Exception e) { potholeModel = null; }
+        try { potholeModel = new Interpreter(loadModelFile("best_float32.tflite")); }
+        catch (Exception e) { potholeModel = null; }
 
-        try {
-            garbageModel = new Interpreter(loadModelFile("garbage_model.tflite"));
-        } catch (Exception e) { garbageModel = null; }
+        try { garbageModel = new Interpreter(loadModelFile("garbage_model.tflite")); }
+        catch (Exception e) { garbageModel = null; }
 
-        Toast.makeText(this, "AI ready", Toast.LENGTH_SHORT).show();
+        Toast.makeText(this, "AI Ready", Toast.LENGTH_SHORT).show();
     }
 
     private ByteBuffer loadModelFile(String modelName) throws Exception {
@@ -161,39 +162,30 @@ public class RegisterComplaintActivity extends AppCompatActivity {
         buffer.order(ByteOrder.nativeOrder());
         buffer.put(model);
         buffer.rewind();
-
         return buffer;
     }
 
-    // 🤖 RUN ALL MODELS
+    // 🤖 YOLO DETECTION
     private void runAllModels(Bitmap bitmap) {
 
         float pipeConf = runYoloModel(pipeModel, bitmap);
         float potholeConf = runYoloModel(potholeModel, bitmap);
         float garbageConf = runYoloModel(garbageModel, bitmap);
 
-        StringBuilder result = new StringBuilder();
+        Set<String> results = new LinkedHashSet<>();
 
-        if (pipeConf > 0.5)
-            result.append("Water Leakage, ");
+        if (pipeConf > 0.5) results.add("Water Leakage");
+        if (potholeConf > 0.5) results.add("Pothole");
+        if (garbageConf > 0.5) results.add("Garbage");
 
-        if (potholeConf > 0.5)
-            result.append("Pothole, ");
-
-        if (garbageConf > 0.5)
-            result.append("Garbage, ");
-
-        if (result.length() > 0) {
-            detectedIssues = result.substring(0, result.length() - 2);
-        } else {
-            detectedIssues = "None";
-        }
+        detectedIssues = results.isEmpty() ? "None" : String.join(", ", results);
 
         runOnUiThread(() ->
-                Toast.makeText(this, "Detected: " + detectedIssues, Toast.LENGTH_LONG).show());
+                Toast.makeText(this,
+                        "Image Detected: " + detectedIssues,
+                        Toast.LENGTH_LONG).show());
     }
 
-    // 🤖 GENERIC YOLO RUNNER
     private float runYoloModel(Interpreter model, Bitmap bitmap) {
 
         if (model == null) return 0f;
@@ -205,9 +197,7 @@ public class RegisterComplaintActivity extends AppCompatActivity {
 
         for (int y = 0; y < inputSize; y++) {
             for (int x = 0; x < inputSize; x++) {
-
                 int pixel = resized.getPixel(x, y);
-
                 input.putFloat(((pixel >> 16) & 0xFF) / 255f);
                 input.putFloat(((pixel >> 8) & 0xFF) / 255f);
                 input.putFloat((pixel & 0xFF) / 255f);
@@ -218,7 +208,6 @@ public class RegisterComplaintActivity extends AppCompatActivity {
         model.run(input, output);
 
         float maxConf = 0f;
-
         for (int i = 0; i < 8400; i++) {
             float confidence = output[0][4][i];
             if (confidence > maxConf) maxConf = confidence;
@@ -227,7 +216,7 @@ public class RegisterComplaintActivity extends AppCompatActivity {
         return maxConf;
     }
 
-    // 🔥 SUBMIT TO FIRESTORE
+    // 🚀 SUBMIT
     private void submitComplaint() {
 
         String description = etDescription.getText().toString().trim();
@@ -237,41 +226,111 @@ public class RegisterComplaintActivity extends AppCompatActivity {
             return;
         }
 
-        String imageBase64 = "";
-        if (selectedBitmap != null) {
-            imageBase64 = bitmapToBase64(selectedBitmap);
+        detectWithGrok(description); // will fallback if fails
+    }
+
+    // 🤖 GROK AI
+    private void detectWithGrok(String description) {
+
+        if (GROK_API_KEY.equals("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")) {
+            uploadFinalComplaint(); // fallback
+            return;
         }
 
+        OkHttpClient client = new OkHttpClient();
+
+        try {
+
+            JSONObject json = new JSONObject();
+            json.put("model", "grok-2-latest");
+
+            JSONArray messages = new JSONArray();
+
+            JSONObject system = new JSONObject();
+            system.put("role", "system");
+            system.put("content",
+                    "Classify into: Road Issue, Garbage Issue, Water Leakage, Electricity Issue, General Complaint. Return comma separated.");
+            messages.put(system);
+
+            JSONObject user = new JSONObject();
+            user.put("role", "user");
+            user.put("content", description);
+            messages.put(user);
+
+            json.put("messages", messages);
+
+            RequestBody body = RequestBody.create(
+                    MediaType.parse("application/json"),
+                    json.toString()
+            );
+
+            Request request = new Request.Builder()
+                    .url("https://api.x.ai/v1/chat/completions")
+                    .addHeader("Authorization", "Bearer " + GROK_API_KEY)
+                    .post(body)
+                    .build();
+
+            new Thread(() -> {
+                try {
+                    Response response = client.newCall(request).execute();
+                    String res = response.body().string();
+
+                    JSONObject obj = new JSONObject(res);
+                    grokDetectedIssues = obj.getJSONArray("choices")
+                            .getJSONObject(0)
+                            .getJSONObject("message")
+                            .getString("content");
+
+                } catch (Exception e) {
+                    grokDetectedIssues = "";
+                }
+
+                runOnUiThread(this::uploadFinalComplaint);
+            }).start();
+
+        } catch (Exception e) {
+            uploadFinalComplaint();
+        }
+    }
+
+    // 🔥 FIRESTORE UPLOAD
+    private void uploadFinalComplaint() {
+
+        Set<String> issueSet = new LinkedHashSet<>();
+
+        if (!detectedIssues.equals("None"))
+            issueSet.addAll(Arrays.asList(detectedIssues.split(", ")));
+
+        if (grokDetectedIssues != null && !grokDetectedIssues.isEmpty())
+            issueSet.addAll(Arrays.asList(grokDetectedIssues.split(", ")));
+
+        String finalIssues = issueSet.isEmpty() ? "General Complaint"
+                : String.join(", ", issueSet);
+
         Map<String, Object> map = new HashMap<>();
-        map.put("description", description);
+        map.put("description", etDescription.getText().toString());
         map.put("address", tvAddress.getText().toString());
-        map.put("issues", detectedIssues);
+        map.put("issues", finalIssues);
         map.put("status", "Pending");
         map.put("timestamp", System.currentTimeMillis());
-        map.put("imageBase64", imageBase64);
+        map.put("imageBase64",
+                selectedBitmap != null ? bitmapToBase64(selectedBitmap) : "");
 
         db.collection("Complaints")
                 .add(map)
-                .addOnSuccessListener(doc -> {
-                    Toast.makeText(this, "Complaint uploaded", Toast.LENGTH_SHORT).show();
-                })
-                .addOnFailureListener(e -> {
-                    Toast.makeText(this, "Upload failed: " + e.getMessage(), Toast.LENGTH_LONG).show();
-                    e.printStackTrace();
-                });
+                .addOnSuccessListener(doc ->
+                        Toast.makeText(this, "Complaint Uploaded", Toast.LENGTH_SHORT).show())
+                .addOnFailureListener(e ->
+                        Toast.makeText(this, "Upload Failed", Toast.LENGTH_LONG).show());
     }
 
-    // 🖼 BITMAP → BASE64
     private String bitmapToBase64(Bitmap bitmap) {
 
         ByteArrayOutputStream baos = new ByteArrayOutputStream();
         bitmap.compress(Bitmap.CompressFormat.JPEG, 60, baos);
-        byte[] imageBytes = baos.toByteArray();
-
-        return Base64.encodeToString(imageBytes, Base64.DEFAULT);
+        return Base64.encodeToString(baos.toByteArray(), Base64.DEFAULT);
     }
 
-    // 🔐 PERMISSION RESULT
     @Override
     public void onRequestPermissionsResult(int requestCode,
                                            @NonNull String[] permissions,
