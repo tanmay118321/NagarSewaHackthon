@@ -69,7 +69,6 @@ public class RegisterComplaintActivity extends AppCompatActivity {
                 Toast.makeText(this, "Complaint Submitted", Toast.LENGTH_SHORT).show());
     }
 
-    // 📍 LOCATION
     private void getCurrentLocation() {
 
         if (ActivityCompat.checkSelfPermission(this, Manifest.permission.ACCESS_FINE_LOCATION)
@@ -131,16 +130,25 @@ public class RegisterComplaintActivity extends AppCompatActivity {
     private void loadModels() {
         try {
             pipeModel = new Interpreter(loadModelFile("PipeLeakage.tflite"));
-            potholeModel = new Interpreter(loadModelFile("best_float32.tflite"));
-            garbageModel = new Interpreter(loadModelFile("garbage_model.tflite"));
-
-            Toast.makeText(this, "Models loaded", Toast.LENGTH_SHORT).show();
-
         } catch (Exception e) {
-            e.printStackTrace();
-            Toast.makeText(this, "Model load failed", Toast.LENGTH_LONG).show();
+            pipeModel = null;
         }
+
+        try {
+            potholeModel = new Interpreter(loadModelFile("pothole.tflite"));
+        } catch (Exception e) {
+            potholeModel = null;
+        }
+
+        try {
+            garbageModel = new Interpreter(loadModelFile("garbage_model.tflite"));
+        } catch (Exception e) {
+            garbageModel = null;
+        }
+
+        Toast.makeText(this, "AI ready (partial allowed)", Toast.LENGTH_SHORT).show();
     }
+
 
     private ByteBuffer loadModelFile(String modelName) throws Exception {
 
