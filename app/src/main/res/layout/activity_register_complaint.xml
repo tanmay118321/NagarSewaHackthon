@@ -42,6 +42,7 @@
         </RelativeLayout>
 
         <LinearLayout
+            android:layout_marginBottom="10dp"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:orientation="vertical"
@@ -66,55 +67,6 @@
                 android:textColor="#6B7280"
                 android:layout_marginTop="6dp"/>
 
-            <!-- CATEGORY -->
-            <TextView
-                android:layout_height="wrap_content"
-                android:layout_width="wrap_content"
-                android:id="@+id/tvCategoryLabel"
-                android:text="CATEGORY"
-                android:textStyle="bold"
-                android:textColor="#6B7280"
-                android:textSize="12sp"
-                android:layout_marginTop="20dp"/>
-
-            <androidx.cardview.widget.CardView
-                android:id="@+id/cardCategory"
-                android:layout_width="match_parent"
-                android:layout_height="56dp"
-                android:layout_marginTop="6dp"
-                app:cardCornerRadius="28dp"
-                app:cardElevation="0dp"
-                app:cardBackgroundColor="@android:color/white"
-                app:strokeColor="#E5E7EB"
-                app:strokeWidth="1dp">
-
-                <RelativeLayout
-                    android:layout_width="match_parent"
-                    android:layout_height="match_parent"
-                    android:paddingStart="16dp"
-                    android:paddingEnd="16dp"
-                    android:gravity="center_vertical">
-
-                    <TextView
-                        android:layout_height="wrap_content"
-                        android:layout_width="wrap_content"
-                        android:id="@+id/tvCategory"
-                        android:text="Select Category (Water, Roads, etc.)"
-                        android:textColor="#6B7280"
-                        android:textSize="14sp"
-                        android:layout_alignParentStart="true"/>
-
-                    <ImageView
-                        android:id="@+id/icDropdown"
-                        android:layout_width="20dp"
-                        android:layout_height="20dp"
-                        android:layout_alignParentEnd="true"
-                        android:src="@drawable/ic_arrow_down"
-                        app:tint="#6B7280"/>
-                </RelativeLayout>
-            </androidx.cardview.widget.CardView>
-
-            <!-- DESCRIPTION -->
             <TextView
                 android:layout_height="wrap_content"
                 android:layout_width="wrap_content"
@@ -230,7 +182,7 @@
             <androidx.cardview.widget.CardView
                 android:id="@+id/cardLocation"
                 android:layout_width="match_parent"
-                android:layout_height="72dp"
+                android:layout_height="wrap_content"
                 android:layout_marginTop="8dp"
                 app:cardCornerRadius="20dp"
                 app:cardElevation="0dp"
@@ -278,15 +230,7 @@
                             android:textSize="12sp"/>
                     </LinearLayout>
 
-                    <TextView
-                        android:layout_height="wrap_content"
-                        android:layout_width="wrap_content"
-                        android:id="@+id/btnEditLocation"
-                        android:text="Edit"
-                        android:textColor="#2D7DD2"
-                        android:textStyle="bold"
-                        android:layout_alignParentEnd="true"
-                        android:layout_centerVertical="true"/>
+
                 </RelativeLayout>
             </androidx.cardview.widget.CardView>
 
