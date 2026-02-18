@@ -1,0 +1,29 @@
+{
+  "project_info": {
+    "project_number": "984902766309",
+    "project_id": "nagarsewahackathon",
+    "storage_bucket": "nagarsewahackathon.firebasestorage.app"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:984902766309:android:6ce3d17acf21dc72b2ce0c",
+        "android_client_info": {
+          "package_name": "com.deepdefender.nagarsewahackthon"
+        }
+      },
+      "oauth_client": [],
+      "api_key": [
+        {
+          "current_key": "AIzaSyDvkhvTPVtcf6lJv85wlzxy442Xzqc9-zU"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": []
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}
