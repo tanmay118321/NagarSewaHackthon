@@ -67,7 +67,7 @@ public class ComplaintDetailActivity extends AppCompatActivity {
             for (String issue : issueArray) {
                 Chip chip = new Chip(this);
                 chip.setText(issue.trim());
-                chip.setChipBackgroundResource(R.drawable.bg_chip);
+                chip.setBackgroundResource(R.drawable.bg_chip);
                 chip.setTextColor(getResources().getColor(R.color.black));
                 chipGroupIssues.addView(chip);
             }
